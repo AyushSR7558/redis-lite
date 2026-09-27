@@ -1,10 +1,16 @@
-struct HNode {
-    uint64_t hcode = 0;
-    struct HNode *next = NULL;
-}
+typedef struct HNode{
+    uint64_t hcode;
+    struct HNode *next;
+} HNode;
 
-struct HTab{
-    HNode **tab = NULL;
-    size_t mask = 0;
-    size_t size = 0;
-}
+typedef struct HTab{
+    HNode **tab;
+    size_t mask;
+    size_t size;
+} HTab;
+ 
+typedef struct HMap{
+    HTab old;
+    HTab new;
+    size_t resizing_pos;
+} HMap;

@@ -4,10 +4,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/hashtable.h"
-
+#include "../include/payload.h"
 
 const size_t resizing_work = 128;
 const size_t max_load_factor = 8;
+
+#define container_of(node, Entry) (struct Entry* )(node)
+
+// Compare two HNode object
+static bool cmp(HNode *node, HNode *key) {
+    struct Entry *ent = container_of(node, Entry);
+    struct Entry *key_ent = container_of(key, Entry);
+
+    return ent->key == key_ent->key;
+}
 
 // Initialize the hash table
 static void h_init(HTab * htab, size_t n) {
@@ -108,7 +118,18 @@ static HNode *hm_lookup(HMap *hmap, HNode *key, bool (*cmp) (HNode *, HNode *)) 
     return (from == NULL? NULL: *from);
 }
 
-
+HNode *hm_pop(HMap* hmap, HNode* key, bool (*com)(HNode*, HNode*)) {
+   hm_help_resizing(hmap);
+    HNode **from = h_lookup(&hmap -> new, key, cmp);
+    if(from) {
+        return h_detach(&hmap -> new, from);
+    } 
+    from = h_lookup(&hmap -> old, key, cmp);
+    if(from) {
+        return h_detach(&hmap -> old, from);
+    }
+    return NULL;
+}
 
 /**
  * HTab -> HTab** tab, size_t size, size_t mask

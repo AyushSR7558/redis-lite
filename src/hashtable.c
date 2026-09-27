@@ -9,16 +9,6 @@
 const size_t resizing_work = 128;
 const size_t max_load_factor = 8;
 
-#define container_of(node, Entry) (struct Entry* )(node)
-
-// Compare two HNode object
-static bool cmp(HNode *node, HNode *key) {
-    struct Entry *ent = container_of(node, Entry);
-    struct Entry *key_ent = container_of(key, Entry);
-
-    return ent->key == key_ent->key;
-}
-
 // Initialize the hash table
 static void h_init(HTab * htab, size_t n) {
     assert(n > 0 && (n & (n - 1)) == 0);
@@ -109,7 +99,7 @@ void hm_insert(HMap *hmap, HNode *key) {
 
 
 // Look for hnode into both the hashtable
-static HNode *hm_lookup(HMap *hmap, HNode *key, bool (*cmp) (HNode *, HNode *)) {
+HNode *hm_lookup(HMap *hmap, HNode *key, bool (*cmp) (HNode *, HNode *)) {
     hm_help_resizing(hmap);
     HNode **from = h_lookup(&hmap -> new, key, cmp);
     if(!from) {
@@ -118,7 +108,7 @@ static HNode *hm_lookup(HMap *hmap, HNode *key, bool (*cmp) (HNode *, HNode *)) 
     return (from == NULL? NULL: *from);
 }
 
-HNode *hm_pop(HMap* hmap, HNode* key, bool (*com)(HNode*, HNode*)) {
+HNode *hm_pop(HMap* hmap, HNode* key, bool (*cmp) (HNode *, HNode *)) {
    hm_help_resizing(hmap);
     HNode **from = h_lookup(&hmap -> new, key, cmp);
     if(from) {
@@ -129,6 +119,18 @@ HNode *hm_pop(HMap* hmap, HNode* key, bool (*com)(HNode*, HNode*)) {
         return h_detach(&hmap -> old, from);
     }
     return NULL;
+}
+
+uint64_t hash_key(const char *key, size_t len)
+{
+    uint64_t h = 14695981039346656037ULL;
+
+    for (size_t i = 0; i < len; i++) {
+        h ^= (uint8_t)key[i];
+        h *= 1099511628211ULL;
+    }
+
+    return h;
 }
 
 /**

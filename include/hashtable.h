@@ -14,3 +14,13 @@ typedef struct HMap{
     HTab new;
     size_t resizing_pos;
 } HMap;
+
+void hm_insert(HMap *hmap, HNode *key);
+
+HNode *hm_pop(HMap *hmap, HNode *key, bool (*cmp) (HNode *, HNode *));
+
+HNode *hm_lookup(HMap *hmap, HNode *key, bool (*cmp) (HNode *, HNode *));
+
+uint64_t hash_key (const char* key, size_t len);
+
+

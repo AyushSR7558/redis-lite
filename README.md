@@ -37,3 +37,10 @@ but in case of hm_lookup it more high-level function where user just want the ad
 
 Q) hmap -> old = HMAP{}; is these like malloc or what?
 => It just assgin the defaul the values to the members of the object.
+
+
+#define container_of(ptr, type, member) ({                    \
+    const typeof(((type *)0)->member) *_mptr = (ptr);         \
+    (type *)((char *)_mptr - offset(type, member));           \
+})
+Given a pointer to a struct member, find the address of the struct containing that member.
